@@ -1,6 +1,7 @@
 path_prefix: src
 src:
     adapter: 'mysql'
+    schema: False
     db:
         name: 'src'
         host: 'localhost'
@@ -9,6 +10,7 @@ src:
 
 dest:
     adapter: 'postgres'
+    schema: True
     db:
         name: 'dest'
         host: 'localhost'
