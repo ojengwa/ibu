@@ -32,3 +32,6 @@ Example
 -------
 
 TBD
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/ojengwa/ibu/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
