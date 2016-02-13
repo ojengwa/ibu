@@ -14,12 +14,12 @@ Installation / Usage
 
 To install use pip:
 
-    $ pip install .
+    $ pip install ibu
 
 
 Or clone the repo:
 
-    $ git clone https://github.com/ojengwa/..git
+    $ git clone https://github.com/ojengwa/ibu.git
     $ python setup.py install
 
 Contributing
