@@ -43,11 +43,12 @@ setup(
     long_description=long_description,
     url='https://github.com/ojengwa/ibu',
     download_url='https://github.com/ojengwa/ibu/tarball/' + VERSION,
-    license='BSD',
+    license='MIT',
     classifiers=[
         'Development Status :: 3 - Alpha',
-        'Intended Audience :: Developers',
+        'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 3',
+        'Topic :: Text Processing :: Linguistic',
     ],
     keywords='database, migration, export, data, db, postgres, mysql,',
     packages=['ibu'],
@@ -55,5 +56,7 @@ setup(
     author='Bernard Ojengwa',
     install_requires=install_requires,
     depedency_links=dependency_links,
-    author_email='bernardojengwa@gmail.com'
+    author_email='bernardojengwa@gmail.com',
+    test_suite='nose.collector',
+    tests_require=['nose'],
 )

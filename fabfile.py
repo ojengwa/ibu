@@ -28,6 +28,7 @@ def push(msg):
     Args:
         msg (str, required): Description
     """
+    clean()
     local("git add . && git commit -m '{}'".format(msg))
     local("git push")
 

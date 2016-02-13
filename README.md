@@ -2,7 +2,6 @@ ibu
 ===============================
 [![Build Status](https://travis-ci.org/ojengwa/ibu.svg?branch=master)](https://travis-ci.org/ojengwa/ibu)
 
-
 version number: 0.0.1
 author: Bernard Ojengwa
 
