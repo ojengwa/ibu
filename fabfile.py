@@ -49,4 +49,4 @@ def deploy(msg="deploy latest version"):
 @task
 def test():
     """Test project."""
-    local("nosetests  --with-coverage")
+    local("coverage erase && nosetests  --with-coverage --cover-package=ibu")
