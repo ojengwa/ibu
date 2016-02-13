@@ -49,4 +49,4 @@ def deploy(msg="deploy latest version"):
 @task
 def test():
     """Test project."""
-    local("python setup.py test")
+    local("nosetests  --with-coverage")

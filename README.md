@@ -1,6 +1,6 @@
 ibu
 ===============================
-[![Build Status](https://travis-ci.org/ojengwa/ibu.svg?branch=master)](https://travis-ci.org/ojengwa/ibu)
+[![Build Status](https://travis-ci.org/ojengwa/ibu.svg?branch=master)](https://travis-ci.org/ojengwa/ibu) [![Coverage Status](https://coveralls.io/repos/github/ojengwa/ibu/badge.svg?branch=master)](https://coveralls.io/github/ojengwa/ibu?branch=master) [![PyPI version](https://badge.fury.io/py/ibu.svg)](https://badge.fury.io/py/ibu)
 
 version number: 0.0.1
 author: Bernard Ojengwa
