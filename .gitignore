@@ -29,7 +29,6 @@ pip-log.txt
 .coverage
 .tox
 nosetests.xml
-fabfile.py
 
 # Complexity
 output/*.html
