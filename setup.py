@@ -7,13 +7,22 @@ Attributes:
     install_requires (TYPE): Description
     VERSION (str): Description
 """
-from setuptools import setup, find_packages
+import re
+import ast
+
+from setuptools import setup
 from codecs import open
 from os import path
 
-VERSION = '0.0.1'
-
 here = path.abspath(path.dirname(__file__))
+
+_version_re = re.compile(r'__version__\s+=\s+(.*)')
+
+
+with open('ibu/__init__.py', 'rb') as f:
+    VERSION = str(ast.literal_eval(_version_re.search(
+        f.read().decode('utf-8')).group(1)))
+
 
 # Get the long description from the README file
 with open(path.join(here, 'README.md'), encoding='utf-8') as f:
@@ -41,7 +50,7 @@ setup(
         'Programming Language :: Python :: 3',
     ],
     keywords='database, migration, export, data, db, postgres, mysql,',
-    packages=find_packages(exclude=['docs', 'tests*']),
+    packages=['ibu'],
     include_package_data=True,
     author='Bernard Ojengwa',
     install_requires=install_requires,
