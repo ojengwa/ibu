@@ -34,7 +34,7 @@ def push(msg):
 
 
 @task
-def deploy(msg="deploy latest version"):
+def publish(msg="deploy latest version"):
     """Deploy the app to PYPI.
 
     Args:
