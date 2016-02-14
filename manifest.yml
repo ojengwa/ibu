@@ -1,0 +1,18 @@
+path_prefix: src
+src:
+    adapter: 'mysql'
+    db:
+        name: 'src'
+        host: 'localhost'
+        user: 'root'
+        pass: ''
+
+dest:
+    adapter: 'postgres'
+    db:
+        name: 'dest'
+        host: 'localhost'
+        user: 'root'
+        pass: ''
+
+
