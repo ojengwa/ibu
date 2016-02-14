@@ -48,7 +48,18 @@ setup(
         'Development Status :: 3 - Alpha',
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 3',
-        'Topic :: Text Processing :: Linguistic',
+        'Environment :: Console'
+        'Operating System :: MacOS :: MacOS X'
+        'Operating System :: Microsoft :: Windows :: Windows NT/2000'
+        'Operating System :: OS Independent'
+        'Operating System :: POSIX'
+        'Operating System :: POSIX :: Linux'
+        'Operating System :: Unix'
+        'Programming Language :: Python'
+        'Topic :: Database'
+        'Topic :: Utilities'
+        'Topic :: Console'
+        'Topic :: Database :: Migration'
     ],
     keywords='database, migration, export, data, db, postgres, mysql,',
     packages=['ibu'],
@@ -59,4 +70,9 @@ setup(
     author_email='bernardojengwa@gmail.com',
     test_suite='nose.collector',
     tests_require=['nose'],
+    entry_points={
+        'console_scripts': [
+            'ibu = ibu.cli:test',
+        ],
+    }
 )
