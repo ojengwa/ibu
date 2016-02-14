@@ -21,6 +21,7 @@ To install use pip:
 Or clone the repo:
 
     $ git clone https://github.com/ojengwa/ibu.git
+
     $ python setup.py install
 
 Contributing
