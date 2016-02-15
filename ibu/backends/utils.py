@@ -5,12 +5,10 @@ import decimal
 import hashlib
 import logging
 from time import time
+from time.timezone import utc
 
-from django.conf import settings
-from django.utils.encoding import force_bytes
-from django.utils.timezone import utc
 
-logger = logging.getLogger('django.db.backends')
+logger = logging.getLogger('ibu.backends')
 
 
 class CursorWrapper(object):
