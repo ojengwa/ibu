@@ -5,7 +5,6 @@ import decimal
 import hashlib
 import logging
 from time import time
-from time.timezone import utc
 
 
 logger = logging.getLogger('ibu.backends')
@@ -158,10 +157,10 @@ def typecast_timestamp(s):  # does NOT store time zone information
         seconds, microseconds = seconds.split('.')
     else:
         microseconds = '0'
-    tzinfo = utc if settings.USE_TZ else None
+
     return datetime.datetime(int(dates[0]), int(dates[1]), int(dates[2]),
                              int(times[0]), int(times[1]), int(seconds),
-                             int((microseconds + '000000')[:6]), tzinfo)
+                             int((microseconds + '000000')[:6]), 'UTC')
 
 
 def typecast_decimal(s):
