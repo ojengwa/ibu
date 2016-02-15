@@ -37,10 +37,6 @@ class BaseDatabaseFeatures(object):
 
     supports_select_related = True
 
-    # Does the default test database allow multiple connections?
-    # Usually an indication that the test database is in-memory
-    test_db_allows_multiple_connections = True
-
     # Can an object be saved without an explicit primary key?
     supports_unspecified_pk = False
 
