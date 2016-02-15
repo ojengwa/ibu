@@ -111,11 +111,9 @@ class BaseDatabaseWrapper(object):
             return None
         elif self.features.supports_timezones:
             return None
-        elif self.settings_dict['TIME_ZONE'] is None:
-            return timezone.utc
         else:
             # Only this branch requires pytz.
-            return pytz.timezone(self.settings_dict['TIME_ZONE'])
+            return 'UTC'
 
     @cached_property
     def timezone_name(self):
@@ -358,7 +356,7 @@ class BaseDatabaseWrapper(object):
         return self.autocommit
 
     def set_autocommit(self, autocommit,
-                       force_begin_transaction_with_broken_autocommit=False):
+                       force_begin=False):
         """
         Enable or disable autocommit.
 
@@ -374,8 +372,8 @@ class BaseDatabaseWrapper(object):
         self.ensure_connection()
 
         start_transaction_under_autocommit = (
-            force_begin_transaction_with_broken_autocommit and not autocommit
-            and self.features.autocommits_when_autocommit_is_off
+            force_begin and not autocommit and self.features
+            .autocommits_when_autocommit_is_off
         )
 
         if start_transaction_under_autocommit:
