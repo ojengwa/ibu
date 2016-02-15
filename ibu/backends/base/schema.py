@@ -1,12 +1,8 @@
 import hashlib
 import logging
+import six
 
-from django.db.backends.utils import truncate_name
-from django.db.transaction import atomic
-from django.utils import six
-from django.utils.encoding import force_bytes
-
-logger = logging.getLogger('django.db.backends.schema')
+logger = logging.getLogger('ibu.backends.schema')
 
 
 def _related_non_m2m_objects(old_field, new_field):
@@ -103,7 +99,8 @@ class BaseDatabaseSchemaEditor(object):
         if self.collect_sql:
             ending = "" if sql.endswith(";") else ";"
             if params is not None:
-                self.collected_sql.append((sql % tuple(map(self.quote_value, params))) + ending)
+                self.collected_sql.append((sql % tuple(map(self.quote_value,
+                                          params))) + ending)
             else:
                 self.collected_sql.append(sql + ending)
         else:
@@ -121,7 +118,7 @@ class BaseDatabaseSchemaEditor(object):
         """
         h = hashlib.md5()
         for arg in args:
-            h.update(force_bytes(arg))
+            h.update(arg)
         return h.hexdigest()[:8]
 
     # Field <-> database mapping functions
