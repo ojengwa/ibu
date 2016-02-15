@@ -3,13 +3,7 @@ import decimal
 import warnings
 from importlib import import_module
 
-from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
-from django.db.backends import utils
-from django.utils import six, timezone
-from django.utils.dateparse import parse_duration
-from django.utils.deprecation import RemovedInDjango20Warning
-from django.utils.encoding import force_text
+from .base import ImproperlyConfigured
 
 
 class BaseDatabaseOperations(object):
@@ -18,7 +12,7 @@ class BaseDatabaseOperations(object):
     a backend performs ordering or calculates the ID of a recently-inserted
     row.
     """
-    compiler_module = "django.db.models.sql.compiler"
+    compiler_module = "ibu.backends.compiler"
 
     # Integer field safe ranges by `internal_type` as documented
     # in docs/ref/models/fields.txt.
@@ -74,13 +68,15 @@ class BaseDatabaseOperations(object):
         Given a lookup_type of 'year', 'month' or 'day', returns the SQL that
         extracts a value from the given date field field_name.
         """
-        raise NotImplementedError('subclasses of BaseDatabaseOperations may require a date_extract_sql() method')
+        raise NotImplementedError(
+            'subclasses of BaseDatabaseOperations may require a date_extract_sql() method')
 
     def date_interval_sql(self, timedelta):
         """
         Implements the date interval functionality for expressions
         """
-        raise NotImplementedError('subclasses of BaseDatabaseOperations may require a date_interval_sql() method')
+        raise NotImplementedError(
+            'subclasses of BaseDatabaseOperations may require a date_interval_sql() method')
 
     def date_trunc_sql(self, lookup_type, field_name):
         """
@@ -88,13 +84,15 @@ class BaseDatabaseOperations(object):
         truncates the given date field field_name to a date object with only
         the given specificity.
         """
-        raise NotImplementedError('subclasses of BaseDatabaseOperations may require a datetrunc_sql() method')
+        raise NotImplementedError(
+            'subclasses of BaseDatabaseOperations may require a datetrunc_sql() method')
 
     def datetime_cast_date_sql(self, field_name, tzname):
         """
         Returns the SQL necessary to cast a datetime value to date value.
         """
-        raise NotImplementedError('subclasses of BaseDatabaseOperations may require a datetime_cast_date() method')
+        raise NotImplementedError(
+            'subclasses of BaseDatabaseOperations may require a datetime_cast_date() method')
 
     def datetime_extract_sql(self, lookup_type, field_name, tzname):
         """
@@ -102,7 +100,8 @@ class BaseDatabaseOperations(object):
         'second', returns the SQL that extracts a value from the given
         datetime field field_name, and a tuple of parameters.
         """
-        raise NotImplementedError('subclasses of BaseDatabaseOperations may require a datetime_extract_sql() method')
+        raise NotImplementedError(
+            'subclasses of BaseDatabaseOperations may require a datetime_extract_sql() method')
 
     def datetime_trunc_sql(self, lookup_type, field_name, tzname):
         """
@@ -111,7 +110,8 @@ class BaseDatabaseOperations(object):
         field_name to a datetime object with only the given specificity, and
         a tuple of parameters.
         """
-        raise NotImplementedError('subclasses of BaseDatabaseOperations may require a datetime_trunk_sql() method')
+        raise NotImplementedError(
+            'subclasses of BaseDatabaseOperations may require a datetime_trunk_sql() method')
 
     def time_extract_sql(self, lookup_type, field_name):
         """
@@ -134,7 +134,8 @@ class BaseDatabaseOperations(object):
         checked for duplicates.
         """
         if fields:
-            raise NotImplementedError('DISTINCT ON fields is not supported by this database backend')
+            raise NotImplementedError(
+                'DISTINCT ON fields is not supported by this database backend')
         else:
             return 'DISTINCT'
 
@@ -191,29 +192,31 @@ class BaseDatabaseOperations(object):
         search of the given field_name. Note that the resulting string should
         contain a '%s' placeholder for the value being searched against.
         """
-        raise NotImplementedError('Full-text search is not implemented for this database backend')
+        raise NotImplementedError(
+            'Full-text search is not implemented for this database backend')
 
-    def last_executed_query(self, cursor, sql, params):
-        """
-        Returns a string of the query last executed by the given cursor, with
-        placeholders replaced with actual values.
+    # def last_executed_query(self, cursor, sql, params):
+    #     """
+    #     Returns a string of the query last executed by the given cursor, with
+    #     placeholders replaced with actual values.
 
-        `sql` is the raw query containing placeholders, and `params` is the
-        sequence of parameters. These are used by default, but this method
-        exists for database backends to provide a better implementation
-        according to their own quoting schemes.
-        """
-        # Convert params to contain Unicode values.
-        def to_unicode(s):
-            return force_text(s, strings_only=True, errors='replace')
-        if isinstance(params, (list, tuple)):
-            u_params = tuple(to_unicode(val) for val in params)
-        elif params is None:
-            u_params = ()
-        else:
-            u_params = {to_unicode(k): to_unicode(v) for k, v in params.items()}
+    #     `sql` is the raw query containing placeholders, and `params` is the
+    #     sequence of parameters. These are used by default, but this method
+    #     exists for database backends to provide a better implementation
+    #     according to their own quoting schemes.
+    #     """
+    # Convert params to contain Unicode values.
+    #     def to_unicode(s):
+    #         return force_text(s, strings_only=True, errors='replace')
+    #     if isinstance(params, (list, tuple)):
+    #         u_params = tuple(to_unicode(val) for val in params)
+    #     elif params is None:
+    #         u_params = ()
+    #     else:
+    #         u_params = {to_unicode(k): to_unicode(v)
+    #                     for k, v in params.items()}
 
-        return six.text_type("QUERY = %r - PARAMS = %r") % (sql, u_params)
+    #     return six.text_type("QUERY = %r - PARAMS = %r") % (sql, u_params)
 
     def last_insert_id(self, cursor, table_name, pk_name):
         """
@@ -252,7 +255,8 @@ class BaseDatabaseOperations(object):
         Returns the value to use for the LIMIT when we are wanting "LIMIT
         infinity". Returns None if the limit clause can be omitted in this case.
         """
-        raise NotImplementedError('subclasses of BaseDatabaseOperations may require a no_limit_value() method')
+        raise NotImplementedError(
+            'subclasses of BaseDatabaseOperations may require a no_limit_value() method')
 
     def pk_default_value(self):
         """
@@ -312,7 +316,8 @@ class BaseDatabaseOperations(object):
         Returns a quoted version of the given table, index or column name. Does
         not quote the given name if it's already been quoted.
         """
-        raise NotImplementedError('subclasses of BaseDatabaseOperations may require a quote_name() method')
+        raise NotImplementedError(
+            'subclasses of BaseDatabaseOperations may require a quote_name() method')
 
     def random_function_sql(self):
         """
@@ -329,7 +334,8 @@ class BaseDatabaseOperations(object):
         If the feature is not supported (or part of it is not supported), a
         NotImplementedError exception can be raised.
         """
-        raise NotImplementedError('subclasses of BaseDatabaseOperations may require a regex_lookup() method')
+        raise NotImplementedError(
+            'subclasses of BaseDatabaseOperations may require a regex_lookup() method')
 
     def savepoint_create_sql(self, sid):
         """
@@ -375,7 +381,8 @@ class BaseDatabaseOperations(object):
         to tables with foreign keys pointing the tables being truncated.
         PostgreSQL requires a cascade even if these tables are empty.
         """
-        raise NotImplementedError('subclasses of BaseDatabaseOperations must provide a sql_flush() method')
+        raise NotImplementedError(
+            'subclasses of BaseDatabaseOperations must provide a sql_flush() method')
 
     def sequence_reset_by_name_sql(self, style, sequences):
         """
@@ -422,9 +429,9 @@ class BaseDatabaseOperations(object):
         """
         return ''
 
-    def prep_for_like_query(self, x):
-        """Prepares a value for use in a LIKE query."""
-        return force_text(x).replace("\\", "\\\\").replace("%", "\%").replace("_", "\_")
+    # def prep_for_like_query(self, x):
+    #     """Prepares a value for use in a LIKE query."""
+    #     return force_text(x).replace("\\", "\\\\").replace("%", "\%").replace("_", "\_")
 
     # Same as prep_for_like_query(), but called for "iexact" matches, which
     # need not necessarily be implemented using "LIKE" in the backend.
@@ -457,41 +464,41 @@ class BaseDatabaseOperations(object):
         else:
             return value
 
-    def adapt_datefield_value(self, value):
-        """
-        Transforms a date value to an object compatible with what is expected
-        by the backend driver for date columns.
-        """
-        if value is None:
-            return None
-        return six.text_type(value)
+    # def adapt_datefield_value(self, value):
+    #     """
+    #     Transforms a date value to an object compatible with what is expected
+    #     by the backend driver for date columns.
+    #     """
+    #     if value is None:
+    #         return None
+    #     return six.text_type(value)
 
-    def adapt_datetimefield_value(self, value):
-        """
-        Transforms a datetime value to an object compatible with what is expected
-        by the backend driver for datetime columns.
-        """
-        if value is None:
-            return None
-        return six.text_type(value)
+    # def adapt_datetimefield_value(self, value):
+    #     """
+    #     Transforms a datetime value to an object compatible with what is expected
+    #     by the backend driver for datetime columns.
+    #     """
+    #     if value is None:
+    #         return None
+    #     return six.text_type(value)
 
-    def adapt_timefield_value(self, value):
-        """
-        Transforms a time value to an object compatible with what is expected
-        by the backend driver for time columns.
-        """
-        if value is None:
-            return None
-        if timezone.is_aware(value):
-            raise ValueError("Django does not support timezone-aware times.")
-        return six.text_type(value)
+    # def adapt_timefield_value(self, value):
+    #     """
+    #     Transforms a time value to an object compatible with what is expected
+    #     by the backend driver for time columns.
+    #     """
+    #     if value is None:
+    #         return None
+    #     if timezone.is_aware(value):
+    #         raise ValueError("Django does not support timezone-aware times.")
+    #     return six.text_type(value)
 
-    def adapt_decimalfield_value(self, value, max_digits, decimal_places):
-        """
-        Transforms a decimal.Decimal value to an object compatible with what is
-        expected by the backend driver for decimal (numeric) columns.
-        """
-        return utils.format_number(value, max_digits, decimal_places)
+    # def adapt_decimalfield_value(self, value, max_digits, decimal_places):
+    #     """
+    #     Transforms a decimal.Decimal value to an object compatible with what is
+    #     expected by the backend driver for decimal (numeric) columns.
+    #     """
+    #     return utils.format_number(value, max_digits, decimal_places)
 
     def adapt_ipaddressfield_value(self, value):
         """
@@ -514,23 +521,23 @@ class BaseDatabaseOperations(object):
         second = self.adapt_datefield_value(second)
         return [first, second]
 
-    def year_lookup_bounds_for_datetime_field(self, value):
-        """
-        Returns a two-elements list with the lower and upper bound to be used
-        with a BETWEEN operator to query a DateTimeField value using a year
-        lookup.
+    # def year_lookup_bounds_for_datetime_field(self, value):
+    #     """
+    #     Returns a two-elements list with the lower and upper bound to be used
+    #     with a BETWEEN operator to query a DateTimeField value using a year
+    #     lookup.
 
-        `value` is an int, containing the looked-up year.
-        """
-        first = datetime.datetime(value, 1, 1)
-        second = datetime.datetime(value, 12, 31, 23, 59, 59, 999999)
-        if settings.USE_TZ:
-            tz = timezone.get_current_timezone()
-            first = timezone.make_aware(first, tz)
-            second = timezone.make_aware(second, tz)
-        first = self.adapt_datetimefield_value(first)
-        second = self.adapt_datetimefield_value(second)
-        return [first, second]
+    #     `value` is an int, containing the looked-up year.
+    #     """
+    #     first = datetime.datetime(value, 1, 1)
+    #     second = datetime.datetime(value, 12, 31, 23, 59, 59, 999999)
+    #     if settings.USE_TZ:
+    #         tz = timezone.get_current_timezone()
+    #         first = timezone.make_aware(first, tz)
+    #         second = timezone.make_aware(second, tz)
+    #     first = self.adapt_datetimefield_value(first)
+    #     second = self.adapt_datetimefield_value(second)
+    #     return [first, second]
 
     def get_db_converters(self, expression):
         """
@@ -541,17 +548,13 @@ class BaseDatabaseOperations(object):
         """
         return []
 
-    def convert_durationfield_value(self, value, expression, connection, context):
-        if value is not None:
-            value = str(decimal.Decimal(value) / decimal.Decimal(1000000))
-            value = parse_duration(value)
-        return value
+    # def convert_durationfield_value(self, value, expression, connection, context):
+    #     if value is not None:
+    #         value = str(decimal.Decimal(value) / decimal.Decimal(1000000))
+    #         value = parse_duration(value)
+    #     return value
 
     def check_aggregate_support(self, aggregate_func):
-        warnings.warn(
-            "check_aggregate_support has been deprecated. Use "
-            "check_expression_support instead.",
-            RemovedInDjango20Warning, stacklevel=2)
         return self.check_expression_support(aggregate_func)
 
     def check_expression_support(self, expression):
