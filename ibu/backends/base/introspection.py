@@ -66,49 +66,49 @@ class BaseDatabaseIntrospection(object):
             'subclasses of BaseDatabaseIntrospection may require a \
             get_table_list() method')
 
-    def installed_models(self, tables):
-        "Returns a set of all models represented by the provided list of table names."
-        from django.apps import apps
-        from django.db import router
-        all_models = []
-        for app_config in apps.get_app_configs():
-            all_models.extend(
-                router.get_migratable_models(app_config, self.connection.alias))
-        tables = list(map(self.table_name_converter, tables))
-        return {
-            m for m in all_models
-            if self.table_name_converter(m._meta.db_table) in tables
-        }
+    # def installed_models(self, tables):
+    #     "Returns a set of all models represented by the provided list of table names."
+    #     from django.apps import apps
+    #     from django.db import router
+    #     all_models = []
+    #     for app_config in apps.get_app_configs():
+    #         all_models.extend(
+    #             router.get_migratable_models(app_config, self.connection.alias))
+    #     tables = list(map(self.table_name_converter, tables))
+    #     return {
+    #         m for m in all_models
+    #         if self.table_name_converter(m._meta.db_table) in tables
+    #     }
 
-    def sequence_list(self):
-        "Returns a list of information about all DB sequences for all models in all apps."
-        from django.apps import apps
-        from django.db import models, router
+    # def sequence_list(self):
+    #     "Returns a list of information about all DB sequences for all models in all apps."
+    #     from django.apps import apps
+    #     from django.db import models, router
 
-        sequence_list = []
+    #     sequence_list = []
 
-        for app_config in apps.get_app_configs():
-            for model in router.get_migratable_models(app_config, self.connection.alias):
-                if not model._meta.managed:
-                    continue
-                if model._meta.swapped:
-                    continue
-                for f in model._meta.local_fields:
-                    if isinstance(f, models.AutoField):
-                        sequence_list.append(
-                            {'table': model._meta.db_table, 'column': f.column})
-                        # Only one AutoField is allowed per model, so don't
-                        # bother continuing.
-                        break
+    #     for app_config in apps.get_app_configs():
+    #         for model in router.get_migratable_models(app_config, self.connection.alias):
+    #             if not model._meta.managed:
+    #                 continue
+    #             if model._meta.swapped:
+    #                 continue
+    #             for f in model._meta.local_fields:
+    #                 if isinstance(f, models.AutoField):
+    #                     sequence_list.append(
+    #                         {'table': model._meta.db_table, 'column': f.column})
+    #                     # Only one AutoField is allowed per model, so don't
+    #                     # bother continuing.
+    #                     break
 
-                for f in model._meta.local_many_to_many:
-                    # If this is an m2m using an intermediate table,
-                    # we don't need to reset the sequence.
-                    if f.remote_field.through is None:
-                        sequence_list.append(
-                            {'table': f.m2m_db_table(), 'column': None})
+    #             for f in model._meta.local_many_to_many:
+    #                 # If this is an m2m using an intermediate table,
+    #                 # we don't need to reset the sequence.
+    #                 if f.remote_field.through is None:
+    #                     sequence_list.append(
+    #                         {'table': f.m2m_db_table(), 'column': None})
 
-        return sequence_list
+    #     return sequence_list
 
     def get_key_columns(self, cursor, table_name):
         """
