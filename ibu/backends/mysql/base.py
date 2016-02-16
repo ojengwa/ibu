@@ -1,5 +1,5 @@
 """
-MySQL database backend for Django.
+MySQL database backend.
 
 Requires mysqlclient: https://pypi.python.org/pypi/mysqlclient/
 MySQLdb is supported for Python 2 only: http://sourceforge.net/projects/mysql-python
