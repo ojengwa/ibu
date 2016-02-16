@@ -6,6 +6,8 @@ import hashlib
 import logging
 from time import time
 
+import six
+
 
 logger = logging.getLogger('ibu.backends')
 
@@ -231,3 +233,117 @@ class cached_property(object):
             return self
         res = instance.__dict__[self.name] = self.func(instance)
         return res
+
+
+def curry(_curried_func, *args, **kwargs):
+    def _curried(*moreargs, **morekwargs):
+        return _curried_func(*(args + moreargs), **dict(kwargs, **morekwargs))
+    return _curried
+
+
+class EscapeData(object):
+    pass
+
+
+class EscapeBytes(bytes, EscapeData):
+    """
+    A byte string that should be HTML-escaped when output.
+    """
+    pass
+
+
+class EscapeText(six.text_type, EscapeData):
+    """
+    A unicode string object that should be HTML-escaped when output.
+    """
+    pass
+
+if six.PY3:
+    EscapeString = EscapeText
+else:
+    EscapeString = EscapeBytes
+    # backwards compatibility for Python 2
+    EscapeUnicode = EscapeText
+
+
+class SafeData(object):
+    def __html__(self):
+        """
+        Returns the html representation of a string for interoperability.
+
+        This allows other template engines to understand Django's SafeData.
+        """
+        return self
+
+
+class SafeBytes(bytes, SafeData):
+    """
+    A bytes subclass that has been specifically marked as "safe" (requires no
+    further escaping) for HTML output purposes.
+    """
+
+    def __add__(self, rhs):
+        """
+        Concatenating a safe byte string with another safe byte string or safe
+        unicode string is safe. Otherwise, the result is no longer safe.
+        """
+        t = super(SafeBytes, self).__add__(rhs)
+        if isinstance(rhs, SafeText):
+            return SafeText(t)
+        elif isinstance(rhs, SafeBytes):
+            return SafeBytes(t)
+        return t
+
+    def _proxy_method(self, *args, **kwargs):
+        """
+        Wrap a call to a normal unicode method up so that we return safe
+        results. The method that is being wrapped is passed in the 'method'
+        argument.
+        """
+        method = kwargs.pop('method')
+        data = method(self, *args, **kwargs)
+        if isinstance(data, bytes):
+            return SafeBytes(data)
+        else:
+            return SafeText(data)
+
+    decode = curry(_proxy_method, method=bytes.decode)
+
+
+class SafeText(six.text_type, SafeData):
+    """
+    A unicode (Python 2) / str (Python 3) subclass that has been specifically
+    marked as "safe" for HTML output purposes.
+    """
+
+    def __add__(self, rhs):
+        """
+        Concatenating a safe unicode string with another safe byte string or
+        safe unicode string is safe. Otherwise, the result is no longer safe.
+        """
+        t = super(SafeText, self).__add__(rhs)
+        if isinstance(rhs, SafeData):
+            return SafeText(t)
+        return t
+
+    def _proxy_method(self, *args, **kwargs):
+        """
+        Wrap a call to a normal unicode method up so that we return safe
+        results. The method that is being wrapped is passed in the 'method'
+        argument.
+        """
+        method = kwargs.pop('method')
+        data = method(self, *args, **kwargs)
+        if isinstance(data, bytes):
+            return SafeBytes(data)
+        else:
+            return SafeText(data)
+
+    encode = curry(_proxy_method, method=six.text_type.encode)
+
+if six.PY3:
+    SafeString = SafeText
+else:
+    SafeString = SafeBytes
+    # backwards compatibility for Python 2
+    SafeUnicode = SafeText
