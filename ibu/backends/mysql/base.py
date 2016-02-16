@@ -332,8 +332,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             table_names = self.introspection.table_names(cursor)
         for table_name in table_names:
             primary_key_column_name = self.introspection\
-                .get_primary_key_column(
-                                        cursor, table_name)
+                .get_primary_key_column(cursor, table_name)
             if not primary_key_column_name:
                 continue
             key_columns = self.introspection.get_key_columns(
