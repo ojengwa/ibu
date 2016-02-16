@@ -1,20 +1,16 @@
 """
-Dummy database backend for Django.
-
-Django uses this if the database ENGINE setting is empty (None or empty string).
-
 Each of these API functions, except connection.close(), raises
 ImproperlyConfigured.
 """
 
-from django.core.exceptions import ImproperlyConfigured
-from django.db.backends.base.base import BaseDatabaseWrapper
-from django.db.backends.base.client import BaseDatabaseClient
-from django.db.backends.base.creation import BaseDatabaseCreation
-from django.db.backends.base.introspection import BaseDatabaseIntrospection
-from django.db.backends.base.operations import BaseDatabaseOperations
-from django.db.backends.base.validation import BaseDatabaseValidation
-from django.db.backends.dummy.features import DummyDatabaseFeatures
+from ibu.backends.base.base import ImproperlyConfigured
+from ibu.backends.base.base import BaseDatabaseWrapper
+from ibu.backends.base.client import BaseDatabaseClient
+from ibu.backends.base.creation import BaseDatabaseCreation
+from ibu.backends.base.introspection import BaseDatabaseIntrospection
+from ibu.backends.base.operations import BaseDatabaseOperations
+from ibu.backends.base.validation import BaseDatabaseValidation
+from ibu.backends.dummy.features import DummyDatabaseFeatures
 
 
 def complain(*args, **kwargs):
