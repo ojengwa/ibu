@@ -1,5 +1,5 @@
-from django.db.backends.base.features import BaseDatabaseFeatures
-from django.utils.functional import cached_property
+from ibu.backends.base.features import BaseDatabaseFeatures
+from ibu.backends.utils import cached_property
 
 from .base import Database
 
