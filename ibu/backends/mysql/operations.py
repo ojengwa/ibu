@@ -2,20 +2,19 @@ from __future__ import unicode_literals
 
 import uuid
 
-from django.conf import settings
-from django.db.backends.base.operations import BaseDatabaseOperations
-from django.utils import six, timezone
-from django.utils.encoding import force_text
+from ibu.backends.base.operations import BaseDatabaseOperations
+import six
+from time import timezone
 
 
 class DatabaseOperations(BaseDatabaseOperations):
-    compiler_module = "django.db.backends.mysql.compiler"
+    compiler_module = "ibu.backends.mysql.compiler"
 
     # MySQL stores positive fields as UNSIGNED ints.
     integer_field_ranges = dict(BaseDatabaseOperations.integer_field_ranges,
-        PositiveSmallIntegerField=(0, 65535),
-        PositiveIntegerField=(0, 4294967295),
-    )
+                                PositiveSmallIntegerField=(0, 65535),
+                                PositiveIntegerField=(0, 4294967295),
+                                )
 
     def date_extract_sql(self, lookup_type, field_name):
         # http://dev.mysql.com/doc/mysql/en/date-and-time-functions.html
@@ -37,14 +36,6 @@ class DatabaseOperations(BaseDatabaseOperations):
         else:
             return "DATE(%s)" % (field_name)
 
-    def _convert_field_to_tz(self, field_name, tzname):
-        if settings.USE_TZ:
-            field_name = "CONVERT_TZ(%s, 'UTC', %%s)" % field_name
-            params = [tzname]
-        else:
-            params = []
-        return field_name, params
-
     def datetime_cast_date_sql(self, field_name, tzname):
         field_name, params = self._convert_field_to_tz(field_name, tzname)
         sql = "DATE(%s)" % field_name
@@ -58,15 +49,18 @@ class DatabaseOperations(BaseDatabaseOperations):
     def datetime_trunc_sql(self, lookup_type, field_name, tzname):
         field_name, params = self._convert_field_to_tz(field_name, tzname)
         fields = ['year', 'month', 'day', 'hour', 'minute', 'second']
-        format = ('%%Y-', '%%m', '-%%d', ' %%H:', '%%i', ':%%s')  # Use double percents to escape.
+        # Use double percents to escape.
+        format = ('%%Y-', '%%m', '-%%d', ' %%H:', '%%i', ':%%s')
         format_def = ('0000-', '01', '-01', ' 00:', '00', ':00')
         try:
             i = fields.index(lookup_type) + 1
         except ValueError:
             sql = field_name
         else:
-            format_str = ''.join([f for f in format[:i]] + [f for f in format_def[i:]])
-            sql = "CAST(DATE_FORMAT(%s, '%s') AS DATETIME)" % (field_name, format_str)
+            format_str = ''.join(
+                [f for f in format[:i]] + [f for f in format_def[i:]])
+            sql = "CAST(DATE_FORMAT(%s, '%s') AS DATETIME)" % (
+                field_name, format_str)
         return sql, params
 
     def date_interval_sql(self, timedelta):
@@ -97,7 +91,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         # With MySQLdb, cursor objects have an (undocumented) "_last_executed"
         # attribute where the exact query sent to the database is saved.
         # See MySQLdb/cursors.py in the source distribution.
-        return force_text(getattr(cursor, '_last_executed', None), errors='replace')
+        return getattr(cursor, '_last_executed', None)
 
     def no_limit_value(self):
         # 2**64 - 1, as recommended by the MySQL documentation
@@ -144,7 +138,8 @@ class DatabaseOperations(BaseDatabaseOperations):
             if settings.USE_TZ:
                 value = timezone.make_naive(value, self.connection.timezone)
             else:
-                raise ValueError("MySQL backend does not support timezone-aware datetimes when USE_TZ is False.")
+                raise ValueError(
+                    "MySQL backend does not support timezone-aware datetimes when USE_TZ is False.")
 
         if not self.connection.features.supports_microsecond_precision:
             value = value.replace(microsecond=0)
@@ -157,7 +152,8 @@ class DatabaseOperations(BaseDatabaseOperations):
 
         # MySQL doesn't support tz-aware times
         if timezone.is_aware(value):
-            raise ValueError("MySQL backend does not support timezone-aware times.")
+            raise ValueError(
+                "MySQL backend does not support timezone-aware times.")
 
         return six.text_type(value)
 
@@ -175,10 +171,13 @@ class DatabaseOperations(BaseDatabaseOperations):
         """
         if connector == '^':
             return 'POW(%s)' % ','.join(sub_expressions)
-        return super(DatabaseOperations, self).combine_expression(connector, sub_expressions)
+        return super(DatabaseOperations,
+                     self).combine_expression(connector,
+                                              sub_expressions)
 
     def get_db_converters(self, expression):
-        converters = super(DatabaseOperations, self).get_db_converters(expression)
+        converters = super(
+            DatabaseOperations, self).get_db_converters(expression)
         internal_type = expression.output_field.get_internal_type()
         if internal_type == 'TextField':
             converters.append(self.convert_textfield_value)
@@ -190,20 +189,9 @@ class DatabaseOperations(BaseDatabaseOperations):
             converters.append(self.convert_uuidfield_value)
         return converters
 
-    def convert_textfield_value(self, value, expression, connection, context):
-        if value is not None:
-            value = force_text(value)
-        return value
-
     def convert_booleanfield_value(self, value, expression, connection, context):
         if value in (0, 1):
             value = bool(value)
-        return value
-
-    def convert_datetimefield_value(self, value, expression, connection, context):
-        if value is not None:
-            if settings.USE_TZ:
-                value = timezone.make_aware(value, self.connection.timezone)
         return value
 
     def convert_uuidfield_value(self, value, expression, connection, context):
