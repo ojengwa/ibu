@@ -1,5 +1,4 @@
-from django.db.backends.base.schema import BaseDatabaseSchemaEditor
-from django.db.models import NOT_PROVIDED
+from ibu.backends.base.schema import BaseDatabaseSchemaEditor
 
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
@@ -48,7 +47,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
         # Simulate the effect of a one-off default.
         # field.default may be unhashable, so a set isn't used for "in" check.
-        if self.skip_default(field) and field.default not in (None, NOT_PROVIDED):
+        if self.skip_default(field):
             effective_default = self.effective_default(field)
             self.execute('UPDATE %(table)s SET %(column)s = %%s' % {
                 'table': self.quote_name(model._meta.db_table),
@@ -61,9 +60,11 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         )
         if storage == "InnoDB":
             for field in model._meta.local_fields:
-                if field.db_index and not field.unique and field.get_internal_type() == "ForeignKey":
-                    # Temporary setting db_index to False (in memory) to disable
-                    # index creation for FKs (index automatically created by MySQL)
+                if field.db_index and not field.unique and \
+                        field.get_internal_type() == "ForeignKey":
+                    # Temporary set db_index to False (in memory) to disable
+                    # index creation for FKs (index automatically created by
+                    # MySQL)
                     field.db_index = False
         return super(DatabaseSchemaEditor, self)._model_indexes_sql(model)
 
@@ -78,10 +79,13 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         """
         first_field = model._meta.get_field(fields[0])
         if first_field.get_internal_type() == 'ForeignKey':
-            constraint_names = self._constraint_names(model, [first_field.column], index=True)
+            constraint_names = self._constraint_names(
+                model, [first_field.column], index=True)
             if not constraint_names:
-                self.execute(self._create_index_sql(model, [first_field], suffix=""))
-        return super(DatabaseSchemaEditor, self)._delete_composed_index(model, fields, *args)
+                self.execute(
+                    self._create_index_sql(model, [first_field], suffix=""))
+        return super(DatabaseSchemaEditor,
+                     self)._delete_composed_index(model, fields, *args)
 
     def _set_field_new_type_null_status(self, field, new_type):
         """
@@ -96,8 +100,12 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
     def _alter_column_type_sql(self, table, old_field, new_field, new_type):
         new_type = self._set_field_new_type_null_status(old_field, new_type)
-        return super(DatabaseSchemaEditor, self)._alter_column_type_sql(table, old_field, new_field, new_type)
+        return super(DatabaseSchemaEditor,
+                     self)._alter_column_type_sql(table, old_field, new_field,
+                                                  new_type)
 
     def _rename_field_sql(self, table, old_field, new_field, new_type):
         new_type = self._set_field_new_type_null_status(old_field, new_type)
-        return super(DatabaseSchemaEditor, self)._rename_field_sql(table, old_field, new_field, new_type)
+        return super(DatabaseSchemaEditor,
+                     self)._rename_field_sql(table, old_field, new_field,
+                                             new_type)
