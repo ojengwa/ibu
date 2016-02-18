@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.utils.encoding import force_str, python_2_unicode_compatible
 
 # Levels
 DEBUG = 10
@@ -11,7 +10,6 @@ ERROR = 40
 CRITICAL = 50
 
 
-@python_2_unicode_compatible
 class CheckMessage(object):
 
     def __init__(self, level, msg, hint=None, obj=None, id=None):
@@ -36,24 +34,22 @@ class CheckMessage(object):
             obj = "?"
         elif isinstance(self.obj, models.base.ModelBase):
             # We need to hardcode ModelBase and Field cases because its __str__
-            # method doesn't return "applabel.modellabel" and cannot be changed.
+            # method doesn't return "applabel.modellabel" and cannot be
+            # changed.
             obj = self.obj._meta.label
         else:
-            obj = force_str(self.obj)
+            obj = self.obj
         id = "(%s) " % self.id if self.id else ""
         hint = "\n\tHINT: %s" % self.hint if self.hint else ''
         return "%s: %s%s%s" % (obj, id, self.msg, hint)
 
     def __repr__(self):
         return "<%s: level=%r, msg=%r, hint=%r, obj=%r, id=%r>" % \
-            (self.__class__.__name__, self.level, self.msg, self.hint, self.obj, self.id)
+            (self.__class__.__name__, self.level,
+             self.msg, self.hint, self.obj, self.id)
 
     def is_serious(self, level=ERROR):
         return self.level >= level
-
-    def is_silenced(self):
-        from django.conf import settings
-        return self.id in settings.SILENCED_SYSTEM_CHECKS
 
 
 class Debug(CheckMessage):
