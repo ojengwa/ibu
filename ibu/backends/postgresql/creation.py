@@ -1,6 +1,6 @@
 import sys
 
-from django.db.backends.base.creation import BaseDatabaseCreation
+from ibu.backends.base.creation import BaseDatabaseCreation
 
 
 class DatabaseCreation(BaseDatabaseCreation):
@@ -8,7 +8,7 @@ class DatabaseCreation(BaseDatabaseCreation):
     def sql_table_creation_suffix(self):
         test_settings = self.connection.settings_dict['TEST']
         assert test_settings['COLLATION'] is None, (
-            "PostgreSQL does not support collation setting at database creation time."
+            "PostgreSQL does not support collation setting at db creation."
         )
         if test_settings['CHARSET']:
             return "WITH ENCODING '%s'" % test_settings['CHARSET']
@@ -32,12 +32,15 @@ class DatabaseCreation(BaseDatabaseCreation):
                     return
                 try:
                     if verbosity >= 1:
-                        print("Destroying old test database for alias %s..." % (
-                            self._get_database_display_str(verbosity, target_database_name),
+                        print("Destroying old test database for alias %s." % (
+                            self._get_database_display_str(
+                                verbosity, target_database_name),
                         ))
-                    cursor.execute("DROP DATABASE %s" % qn(target_database_name))
+                    cursor.execute("DROP DATABASE %s" %
+                                   qn(target_database_name))
                     cursor.execute("CREATE DATABASE %s WITH TEMPLATE %s" % (
                         qn(target_database_name), qn(source_database_name)))
                 except Exception as e:
-                    sys.stderr.write("Got an error cloning the test database: %s\n" % e)
+                    sys.stderr.write(
+                        "Got an error cloning the test database: %s\n" % e)
                     sys.exit(2)
