@@ -1,9 +1,9 @@
 import os
 import subprocess
 
-from django.core.files.temp import NamedTemporaryFile
-from django.db.backends.base.client import BaseDatabaseClient
-from django.utils.six import print_
+from ibu.files.temp import NamedTemporaryFile
+from ibu.backends.base.client import BaseDatabaseClient
+from six import print_
 
 
 def _escape_pgpass(txt):
