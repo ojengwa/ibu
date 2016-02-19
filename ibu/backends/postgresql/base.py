@@ -1,20 +1,19 @@
 """
-PostgreSQL database backend for Django.
+PostgreSQL database backend.
 
 Requires psycopg 2: http://initd.org/projects/psycopg2
 """
 
 import warnings
 
-from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
-from django.db import DEFAULT_DB_ALIAS
-from django.db.backends.base.base import BaseDatabaseWrapper
-from django.db.backends.base.validation import BaseDatabaseValidation
-from django.db.utils import DatabaseError as WrappedDatabaseError
-from django.utils.encoding import force_str
-from django.utils.functional import cached_property
-from django.utils.safestring import SafeBytes, SafeText
+from ibu.config import DEFAULT_DB_ALIAS, Config
+from ibu.backends.base.base import (BaseDatabaseWrapper,
+                                    ImproperlyConfigured,
+                                    DatabaseError as WrappedDatabaseError)
+from ibu.backends.base.validation import BaseDatabaseValidation
+from ibu.backends.utils import (cached_property,
+                                SafeBytes,
+                                SafeText)
 
 try:
     import psycopg2 as Database
@@ -31,10 +30,13 @@ def psycopg2_version():
 PSYCOPG2_VERSION = psycopg2_version()
 
 if PSYCOPG2_VERSION < (2, 4, 5):
-    raise ImproperlyConfigured("psycopg2_version 2.4.5 or newer is required; you have %s" % psycopg2.__version__)
+    raise ImproperlyConfigured(
+        "psycopg2_version 2.4.5 or newer is required; you have %s" %
+        psycopg2.__version__)
 
 
-# Some of these import psycopg2, so import them after checking if it's installed.
+# Some of these import psycopg2, so import them after checking if it's
+# installed.
 from .client import DatabaseClient                          # isort:skip
 from .creation import DatabaseCreation                      # isort:skip
 from .features import DatabaseFeatures                      # isort:skip
@@ -47,10 +49,14 @@ from .version import get_version                            # isort:skip
 DatabaseError = Database.DatabaseError
 IntegrityError = Database.IntegrityError
 
+settings = Config()
+
 psycopg2.extensions.register_type(psycopg2.extensions.UNICODE)
 psycopg2.extensions.register_type(psycopg2.extensions.UNICODEARRAY)
-psycopg2.extensions.register_adapter(SafeBytes, psycopg2.extensions.QuotedString)
-psycopg2.extensions.register_adapter(SafeText, psycopg2.extensions.QuotedString)
+psycopg2.extensions.register_adapter(
+    SafeBytes, psycopg2.extensions.QuotedString)
+psycopg2.extensions.register_adapter(
+    SafeText, psycopg2.extensions.QuotedString)
 psycopg2.extras.register_uuid()
 
 # Register support for inet[] manually so we don't have to handle the Inet()
@@ -67,7 +73,7 @@ psycopg2.extensions.register_type(INETARRAY)
 class DatabaseWrapper(BaseDatabaseWrapper):
     vendor = 'postgresql'
     # This dictionary maps Field objects to their associated PostgreSQL column
-    # types, as strings. Column-type strings can contain format strings; they'll
+    # types, as strings. Column-type strings can contain format strings; they'l
     # be interpolated against the values of Field.__dict__ before being output.
     # If a column type is set to None, it won't be included in the output.
     data_types = {
@@ -200,7 +206,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         if self.timezone_name and conn_timezone_name != self.timezone_name:
             cursor = self.connection.cursor()
             try:
-                cursor.execute(self.ops.set_time_zone_sql(), [self.timezone_name])
+                cursor.execute(
+                    self.ops.set_time_zone_sql(), [self.timezone_name])
             finally:
                 cursor.close()
             # Commit after setting the time zone (see #17062)
@@ -226,7 +233,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     def is_usable(self):
         try:
-            # Use a psycopg cursor directly, bypassing Django's utilities.
+            # Use a psycopg cursor directly, bypassing Ibu's utilities.
             self.connection.cursor().execute("SELECT 1")
         except Database.Error:
             return False
@@ -240,15 +247,16 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             nodb_connection.ensure_connection()
         except (DatabaseError, WrappedDatabaseError):
             warnings.warn(
-                "Normally Django will use a connection to the 'postgres' database "
+                "Normally Ibu will use a connection to the 'postgres' database "
                 "to avoid running initialization queries against the production "
                 "database when it's not needed (for example, when running tests). "
-                "Django was unable to create a connection to the 'postgres' database "
+                "Ibu was unable to create a connection to the 'postgres' database "
                 "and will use the default database instead.",
                 RuntimeWarning
             )
             settings_dict = self.settings_dict.copy()
-            settings_dict['NAME'] = settings.DATABASES[DEFAULT_DB_ALIAS]['NAME']
+            settings_dict['NAME'] = settings.DATABASES[
+                DEFAULT_DB_ALIAS]['NAME']
             nodb_connection = self.__class__(
                 self.settings_dict.copy(),
                 alias=self.alias,
