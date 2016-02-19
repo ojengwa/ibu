@@ -6,18 +6,18 @@ from __future__ import unicode_literals
 
 from io import BytesIO
 
-from django.conf import settings
-from django.core.files.uploadedfile import (
+from ibu.config import Config
+from ibu.files.uploadedfile import (
     InMemoryUploadedFile, TemporaryUploadedFile,
 )
-from django.utils.encoding import python_2_unicode_compatible
-from django.utils.module_loading import import_string
 
 __all__ = [
     'UploadFileException', 'StopUpload', 'SkipFile', 'FileUploadHandler',
     'TemporaryFileUploadHandler', 'MemoryFileUploadHandler', 'load_handler',
     'StopFutureHandlers'
 ]
+
+settings = Config()
 
 
 class UploadFileException(Exception):
@@ -27,11 +27,11 @@ class UploadFileException(Exception):
     pass
 
 
-@python_2_unicode_compatible
 class StopUpload(UploadFileException):
     """
     This exception is raised when an upload must abort.
     """
+
     def __init__(self, connection_reset=False):
         """
         If ``connection_reset`` is ``True``, Django knows will halt the upload
@@ -113,7 +113,8 @@ class FileUploadHandler(object):
         Receive data from the streamed upload parser. ``start`` is the position
         in the file of the chunk.
         """
-        raise NotImplementedError('subclasses of FileUploadHandler must provide a receive_data_chunk() method')
+        raise NotImplementedError(
+            'subclasses of FileUploadHandler must provide a receive_data_chunk() method')
 
     def file_complete(self, file_size):
         """
@@ -122,7 +123,8 @@ class FileUploadHandler(object):
 
         Subclasses should return a valid ``UploadedFile`` object.
         """
-        raise NotImplementedError('subclasses of FileUploadHandler must provide a file_complete() method')
+        raise NotImplementedError(
+            'subclasses of FileUploadHandler must provide a file_complete() method')
 
     def upload_complete(self):
         """
@@ -136,6 +138,7 @@ class TemporaryFileUploadHandler(FileUploadHandler):
     """
     Upload handler that streams data into a temporary file.
     """
+
     def __init__(self, *args, **kwargs):
         super(TemporaryFileUploadHandler, self).__init__(*args, **kwargs)
 
@@ -144,7 +147,8 @@ class TemporaryFileUploadHandler(FileUploadHandler):
         Create the file object to append to as data is coming in.
         """
         super(TemporaryFileUploadHandler, self).new_file(*args, **kwargs)
-        self.file = TemporaryUploadedFile(self.file_name, self.content_type, 0, self.charset, self.content_type_extra)
+        self.file = TemporaryUploadedFile(
+            self.file_name, self.content_type, 0, self.charset, self.content_type_extra)
 
     def receive_data_chunk(self, raw_data, start):
         self.file.write(raw_data)
