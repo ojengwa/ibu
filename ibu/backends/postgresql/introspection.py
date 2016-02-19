@@ -2,10 +2,9 @@ from __future__ import unicode_literals
 
 from collections import namedtuple
 
-from django.db.backends.base.introspection import (
+from ibu.backends.base.introspection import (
     BaseDatabaseIntrospection, FieldInfo, TableInfo,
 )
-from django.utils.encoding import force_text
 
 FieldInfo = namedtuple('FieldInfo', FieldInfo._fields + ('default',))
 
@@ -45,7 +44,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             AND c.relname = %s"""
 
     def get_field_type(self, data_type, description):
-        field_type = super(DatabaseIntrospection, self).get_field_type(data_type, description)
+        field_type = super(DatabaseIntrospection, self).get_field_type(
+            data_type, description)
         if description.default and 'nextval' in description.default:
             if field_type == 'IntegerField':
                 return 'AutoField'
@@ -77,9 +77,11 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             FROM information_schema.columns
             WHERE table_name = %s""", [table_name])
         field_map = {line[0]: line[1:] for line in cursor.fetchall()}
-        cursor.execute("SELECT * FROM %s LIMIT 1" % self.connection.ops.quote_name(table_name))
-        return [FieldInfo(*((force_text(line[0]),) + line[1:6]
-                            + (field_map[force_text(line[0])][0] == 'YES', field_map[force_text(line[0])][1])))
+        cursor.execute("SELECT * FROM %s LIMIT 1" %
+                       self.connection.ops.quote_name(table_name))
+        return [FieldInfo(*((line[0],) + line[1:6]
+                          + (field_map[line[0]][0] == 'YES',
+                             field_map[line[0]®][1])))
                 for line in cursor.description]
 
     def get_relations(self, cursor, table_name):
@@ -132,7 +134,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 continue
             if row[0] not in indexes:
                 indexes[row[0]] = {'primary_key': False, 'unique': False}
-            # It's possible to have the unique and PK constraints in separate indexes.
+            # It's possible to have the unique and PK constraints in separate
+            # indexes.
             if row[3]:
                 indexes[row[0]]['primary_key'] = True
             if row[2]:
