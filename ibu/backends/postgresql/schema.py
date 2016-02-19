@@ -1,6 +1,6 @@
 import psycopg2
 
-from django.db.backends.base.schema import BaseDatabaseSchemaEditor
+from ibu.backends.base.schema import BaseDatabaseSchemaEditor
 
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
@@ -112,14 +112,18 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         )
         # Added an index? Create any PostgreSQL-specific indexes.
         if not old_field.db_index and not old_field.unique and (new_field.db_index or new_field.unique):
-            like_index_statement = self._create_like_index_sql(model, new_field)
+            like_index_statement = self._create_like_index_sql(
+                model, new_field)
             if like_index_statement is not None:
                 self.execute(like_index_statement)
 
         # Removed an index? Drop any PostgreSQL-specific indexes.
         if (old_field.db_index or old_field.unique) and not (new_field.db_index or new_field.unique):
-            index_to_remove = self._create_index_name(model, [old_field.column], suffix='_like')
-            index_names = self._constraint_names(model, [old_field.column], index=True)
+            index_to_remove = self._create_index_name(
+                model, [old_field.column], suffix='_like')
+            index_names = self._constraint_names(
+                model, [old_field.column], index=True)
             for index_name in index_names:
                 if index_name == index_to_remove:
-                    self.execute(self._delete_constraint_sql(self.sql_delete_index, model, index_name))
+                    self.execute(
+                        self._delete_constraint_sql(self.sql_delete_index, model, index_name))
