@@ -19,7 +19,7 @@ full range of keyword arguments available in Python 2.6+ and 3.0+.
 import os
 import tempfile
 
-from django.core.files.utils import FileProxyMixin
+from ibu.files.utils import FileProxyMixin
 
 __all__ = ('NamedTemporaryFile', 'gettempdir',)
 
@@ -35,8 +35,9 @@ if os.name == 'nt':
         Python 2.6+, or the 'delete', 'buffering', 'encoding', or 'newline'
         keyword arguments in Python 3.0+.
         """
+
         def __init__(self, mode='w+b', bufsize=-1, suffix='', prefix='',
-                dir=None):
+                     dir=None):
             fd, name = tempfile.mkstemp(suffix=suffix, prefix=prefix, dir=dir)
             self.name = name
             self.file = os.fdopen(fd, mode, bufsize)
