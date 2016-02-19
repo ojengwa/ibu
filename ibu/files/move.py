@@ -8,7 +8,7 @@ Move a file in the safest way possible::
 import os
 from shutil import copystat
 
-from django.core.files import locks
+from ibu.files import locks
 
 __all__ = ['file_move_safe']
 
