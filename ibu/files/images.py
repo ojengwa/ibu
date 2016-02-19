@@ -6,7 +6,7 @@ Requires Pillow as you might imagine.
 import struct
 import zlib
 
-from django.core.files import File
+from ibu.files import File
 
 
 class ImageFile(File):
