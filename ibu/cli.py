@@ -9,6 +9,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
 @click.group()
 def ibu():
+    """This is still a work in progress."""
     pass
 
 
