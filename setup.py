@@ -48,25 +48,22 @@ setup(
         'Development Status :: 3 - Alpha',
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 3',
-        'Environment :: Console'
-        'Operating System :: MacOS :: MacOS X'
-        'Operating System :: Microsoft :: Windows :: Windows NT/2000'
-        'Operating System :: OS Independent'
-        'Operating System :: POSIX'
-        'Operating System :: POSIX :: Linux'
-        'Operating System :: Unix'
-        'Programming Language :: Python'
-        'Topic :: Database'
-        'Topic :: Utilities'
-        'Topic :: Console'
-        'Topic :: Database :: Migration'
+        'Environment :: Console',
+        'Operating System :: MacOS :: MacOS X',
+        'Operating System :: Microsoft :: Windows :: Windows NT/2000',
+        'Operating System :: OS Independent',
+        'Operating System :: POSIX',
+        'Operating System :: POSIX :: Linux',
+        'Operating System :: Unix',
+        'Programming Language :: Python',
+        'Topic :: Database',
+        'Topic :: Utilities',
     ],
     keywords='database, migration, export, data, db, postgres, mysql,',
     packages=['ibu'],
     include_package_data=True,
     author='Bernard Ojengwa',
     install_requires=install_requires,
-    depedency_links=dependency_links,
     author_email='bernardojengwa@gmail.com',
     test_suite='nose.collector',
     tests_require=['nose'],
