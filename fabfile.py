@@ -52,11 +52,11 @@ def publish():
         msg (str, optional): Description
     """
     clean()
-    local("python setup.py bdist_wininst")
+    # local("python setup.py bdist_wininst")
     local("python setup.py bdist_egg")
     build = local("python setup.py sdist")
     if build.succeeded:
-        local("python setup.py upload")
+        local("python setup.py sdist upload")
 
 
 @task
