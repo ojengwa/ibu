@@ -5,7 +5,7 @@ ibu
 Overview
 --------
 
-A database agnotics migration and data export tool.
+A database agnotics migration and data export tool. WIP
 
 Installation / Usage
 --------------------
