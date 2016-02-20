@@ -69,7 +69,7 @@ setup(
     tests_require=['nose'],
     entry_points={
         'console_scripts': [
-            'ibu = ibu.cli:test',
+            'ibu = ibu.cli:cli',
         ],
     }
 )
