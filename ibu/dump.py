@@ -33,7 +33,7 @@ class Command(BaseCommand):
         parser.add_argument('--natural-primary', action='store_true', dest='use_natural_primary_keys', default=False,
                             help='Use natural primary keys if they are available.')
         parser.add_argument('-a', '--all', action='store_true', dest='use_base_manager', default=False,
-                            help="Use Django's base manager to dump all models stored in the database, "
+                            help="Use base manager to dump all models stored in the database, "
                             "including those that would otherwise be filtered or modified by a custom manager.")
         parser.add_argument('--pks', dest='primary_keys',
                             help="Only dump objects with given primary keys. "
