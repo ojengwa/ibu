@@ -52,7 +52,7 @@ class NotSupportedError(DatabaseError):
 class DatabaseErrorWrapper(object):
     """
     Context manager and decorator that re-throws backend-specific database
-    exceptions using Django's common wrappers.
+    exceptions using common wrappers.
     """
 
     def __init__(self, wrapper):
@@ -106,8 +106,7 @@ def load_backend(backend_name):
     backend name, or raise an error if it doesn't exist.
     """
 
-    if backend_name == 'django.db.backends.postgresql_psycopg2':
-        backend_name = 'django.db.backends.postgresql'
+    backend_name = 'db.backends.postgresql'
 
     try:
         return import_module('%s.base' % backend_name)
@@ -125,17 +124,16 @@ def load_backend(backend_name):
             ]
         except EnvironmentError:
             builtin_backends = []
-        if backend_name not in ['django.db.backends.%s' % b for b in
+        if backend_name not in ['db.backends.%s' % b for b in
                                 builtin_backends]:
             backend_reprs = map(repr, sorted(builtin_backends))
             error_msg = ("%r isn't an available database backend.\n"
-                         "Try using 'django.db.backends.XXX', where XXX "
+                         "Try using 'db.backends.XXX', where XXX "
                          "is one of:\n    %s\nError was: %s" %
                          (backend_name, ", ".join(backend_reprs), e_user))
             raise ImproperlyConfigured(error_msg)
         else:
-            # If there's some other error, this must be an error in Django
-            raise
+            # If there's some other error
 
 
 class ConnectionDoesNotExist(Exception):
@@ -158,12 +156,12 @@ class ConnectionHandler(object):
         if self._databases == {}:
             self._databases = {
                 DEFAULT_DB_ALIAS: {
-                    'ENGINE': 'django.db.backends.dummy',
+                    'ENGINE': 'db.backends.dummy',
                 },
             }
         if self._databases[DEFAULT_DB_ALIAS] == {}:
             self._databases[DEFAULT_DB_ALIAS][
-                'ENGINE'] = 'django.db.backends.dummy'
+                'ENGINE'] = 'db.backends.dummy'
 
         if DEFAULT_DB_ALIAS not in self._databases:
             raise ImproperlyConfigured(
@@ -183,9 +181,9 @@ class ConnectionHandler(object):
 
         conn.setdefault('ATOMIC_REQUESTS', False)
         conn.setdefault('AUTOCOMMIT', True)
-        conn.setdefault('ENGINE', 'django.db.backends.dummy')
-        if conn['ENGINE'] == 'django.db.backends.' or not conn['ENGINE']:
-            conn['ENGINE'] = 'django.db.backends.dummy'
+        conn.setdefault('ENGINE', 'db.backends.dummy')
+        if conn['ENGINE'] == 'db.backends.' or not conn['ENGINE']:
+            conn['ENGINE'] = 'db.backends.dummy'
         conn.setdefault('CONN_MAX_AGE', 0)
         conn.setdefault('OPTIONS', {})
         conn.setdefault('TIME_ZONE', None)
